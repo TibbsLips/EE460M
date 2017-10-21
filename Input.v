@@ -39,14 +39,17 @@ module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,led,time);
   input sw0;             //reset to 10s
   input sw1;             //reset to 205s
 
-  output reg flashFlag;   //will be 1 when we are supposed to flash
   output reg ledFlag;     //will send final LED status from
   output reg [13:0]time;  //will have the time to display on led
+
+  reg [2:0]state;
 
   wire btnUstable;        //make sure to debounce
   wire btnLstable;
   wire btnRstable;
   wire btnDstable;
+  wire sw0;
+  wire sw1;
 
   debounce up(clk,btnU,btnUstable);
   debounce left(clk,btnL,btnLstable);
@@ -63,14 +66,13 @@ module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,led,time);
     begin
       state=0; //state0 means no time, flashing
       time=0;
-      flashFlag=0;
       ledFlag=0;
     end
 
 always@(posedge clk)
   begin
 
-  if(btnU==1)
+  if(btnUstable==1)
     begin
       if(time+50<=9999)
         begin
@@ -82,7 +84,7 @@ always@(posedge clk)
         end
     end
 
-  else if(btnL==1)
+  else if(btnLstable==1)
     begin
       if(time+150<=9999)
         begin
@@ -94,7 +96,7 @@ always@(posedge clk)
         end
     end
 
-  else if(btnR==1)
+  else if(btnRstable==1)
     begin
       if(time+200<=9999)
         begin
@@ -106,7 +108,7 @@ always@(posedge clk)
         end
     end
 
-  else if(btnD==1)
+  else if(btnDstable==1)
     begin
       if(time+500<=9999)
         begin
@@ -136,27 +138,7 @@ always@(posedge clk)
   ////we need to send numbers with BCD to 7-seg
   //////////////////////////////////////////////
   /////end of time update, time to decrement and flash
-  if(state==0) //time=0 should be flashing 0000
-    led=1;
-    begin
-      if(time>200)
-        state=3;
-      else if(time)  
 
-    end
-  else if(state==1) //slow flashing, time<200 but not==0
+  if(time==0)
     begin
-    end
-  else if(state==2)
-    begin
-    end
-  else if(state==3) //there should be no flashing, time>200
-    begin
-      led=1;
-      if(time==0) //go to quick flashing 0000
-        state=0;
-      else if((time!=0) && time<200) 
-        state=1;
-        
-
-    end
+    
