@@ -31,7 +31,7 @@ module debounce(clk,in,out);
 endmodule
 
 
-module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,led,time);
+module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,time);
   input btnU;            //add 50
   input btnL;            //add 150
   input btnR;            //add 200
@@ -39,10 +39,9 @@ module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,led,time);
   input sw0;             //reset to 10s
   input sw1;             //reset to 205s
 
-  output reg ledFlag;     //will send final LED status from
+  output reg mode;     //will send final LED status from
   output reg [13:0]time;  //will have the time to display on led
 
-  reg [2:0]state;
 
   wire btnUstable;        //make sure to debounce
   wire btnLstable;
@@ -66,7 +65,7 @@ module input(clk,btnU,btnL,btnR,btnD,sw0,sw1,led,time);
     begin
       state=0; //state0 means no time, flashing
       time=0;
-      ledFlag=0;
+      mode=0;
     end
 
 always@(posedge clk)
@@ -141,4 +140,33 @@ always@(posedge clk)
 
   if(time==0)
     begin
-    
+      mode=2; //blink at 0.5 Hz
+      time=0;
+    end
+
+  else if((time<=200)&&(time>0))
+    begin
+      mode=3; //blink at 1Hz
+      if(time%2==1)
+        begin
+          time=time-1;
+        end
+      else
+        begin
+          time=time-2; //This will let the display skip odd numbers
+        end
+    end
+
+  else if(time>200)
+    begin
+      mode=1; //LED's on
+      time=time-1;
+    end
+
+  else
+    begin
+        mode=0;
+        time=time;
+    end
+end
+endmodule
