@@ -41,7 +41,7 @@ module inputs(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
   input sw1;             //reset to 205s
 
   output reg mode;     //will send final LED status from
-  output reg [13:0]times;  //will have the time to display on led
+  output reg [15:0]times;  //will have the time to display on led
 
 
   wire btnUstable;        //make sure to debounce
@@ -56,11 +56,6 @@ module inputs(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
   debounce right(clk,btnR,btnRstable);
   debounce down(clk,btnD,btnDstable);
 
-  //need states for flashing lights
-  //state 0: flashing 0's
-  //state 1: flashing because less than 200seconds
-  //state 2: flashing because
-  //state 3: solid number
 
   initial
     begin
@@ -169,4 +164,51 @@ always@(posedge clk)
         times=times;
     end
 end
+endmodule
+
+module decToBCD(timer,digit1,digit2,digit3,digit4);
+input [15:0]timer;
+output reg [3:0]digit1;
+output reg [3:0]digit2;
+output reg [3:0]digit3;
+output reg [3:0]digit4;
+
+
+  ////value rolls over when 10-> 10= 1010->goes up to 1001
+  always@(timer)
+    begin
+      digit4=0; //thousands place
+      digit3=0; //hundreds place
+      digit2=0; //tens place
+      digit1=0; //ones place
+    end
+
+    for(i=15; i>=0; i=i-1)
+      begin
+        if(digit4 >=5)
+          digit4=digit4+3;
+        else
+          digit4=digit4;
+
+        if(digit3>=5)
+          digit3=digit3+3;
+        else
+          digit3=digit3;
+
+        if(digit2>=5)
+          digit2=digit2+3;
+        else
+          digit2=digit2;
+
+        if(digit1>=5)
+          digit1=digit1+3;
+        else
+          digit1=digit1;
+
+        digit4={digit4[2:0], digit3[3]};
+        digit3={digit3[2:0], digit2[3]};
+        digit2={digit2[2:0], digit1[3]};
+        digit1={digit1[2:0], timer[i]};
+      end
+
 endmodule
