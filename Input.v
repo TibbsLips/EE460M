@@ -202,7 +202,7 @@ integer i;
         else
           digit2 = digit2;
 
-        if(digit1 >= 5)
+        if(digit1 >= 5) 
           digit1 = digit1+3;
         else
           digit1 = digit1;
