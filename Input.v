@@ -1,36 +1,3 @@
-module DFF(d,clk,q,qn);
-  input d;
-  input clk;
-  output reg q;
-  output reg qn;
-
-  always@(posedge clk)
-  begin
-      q<=d;
-      qn<=~d;
-  end
-endmodule
-
-
-
-module debounce(clk,in,out);
-  input clk;
-  input in;
-  output out;
-
-  wire q1;  //output from flip flop 1
-  wire q1n; //qn output from flip flop 1
-  wire q2;  //output from flip flop 2
-  wire q2n; //qn output from flip flop 2
-
-  DFF firstFlop(in,clk,q1,q1n);
-  DFF secondFlop(q1,clk,q2,q2n);
-
-  assign out= q2;
-
-endmodule
-
-
 module inputs(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
   input clk;
   input btnU;            //add 50
