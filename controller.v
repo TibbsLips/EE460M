@@ -1,5 +1,6 @@
-module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
-	input clk;
+module controller(f_clk, s_clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
+	input s_clk;
+	input f_clk;
 	input btnU;            //add 50
 	input btnL;            //add 150
 	input btnR;            //add 200
@@ -10,7 +11,7 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	output reg [1:0] mode;     //will send final LED status from
 	output reg [15:0]times;  //will have the time to display on led
 	
-	reg [15:0] next_time;
+	reg [15:0] to_add;
 
 
 	wire btnUstable;        //make sure to debounce
@@ -20,55 +21,59 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	wire sw0;
 	wire sw1;
 
-	debounce up(clk,btnU,btnUstable);
-	debounce left(clk,btnL,btnLstable);
-	debounce right(clk,btnR,btnRstable);
-	debounce down(clk,btnD,btnDstable);
+	debounce up(f_clk,btnU,btnUstable);
+	debounce left(f_clk,btnL,btnLstable);
+	debounce right(f_clk,btnR,btnRstable);
+	debounce down(f_clk,btnD,btnDstable);
 
 
 	initial begin
-		next_time = 0;
+		to_add = 0;
 		times=0;
 		mode=0;
 	end
+	
 
-	always @ (btnDstable, btnLstable, btnRstable, btnUstable, sw0, sw1) begin
+    
+	always @ (posedge btnDstable, posedge btnLstable, posedge btnRstable, posedge btnUstable, posedge sw0, posedge sw1, posedge s_clk) begin
 		if(btnUstable==1) begin
 			times = times+50;
 		end
-
-		if(btnLstable==1) begin
+        else if(btnLstable==1) begin
 			times = times+150;
 		end
 
-		if(btnRstable==1) begin
+		else if(btnRstable==1) begin
 			times = times+200;
 		end
 		
-		if(btnDstable==1) begin
+		else if(btnDstable==1) begin
 			times = times+500;
 		end
 		
-		if(times>=9999) begin
+		else if(times>=9999) begin
 			times = 9999;
 		end
 
-		if(sw0 == 1) begin
+		else if(sw0 == 1) begin
 			times = 10;
 		end
 
-		if(sw1 == 1) begin
+		else if(sw1 == 1) begin
 			times = 205;
 		end
+		
+		else if(times == 0) begin
+            times = times;
+        end
+        
+        else if (s_clk == 1)begin
+            times = times - 1;
+        end
+        else begin
+            times = times;
+        end
 	
-	end
-	
-	always@(posedge clk) begin
-		if(times == 0) begin
-		end
-		else begin
-			times = times - 1;
-		end
 	end
 	
 	always @ (times) begin
