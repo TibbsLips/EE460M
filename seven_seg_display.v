@@ -11,12 +11,12 @@ module seven_seg_display(s_clk, f_clk, mode, seg1, seg2, seg3, seg4, anode, cath
 	*/
 	input [3:0] seg1, seg2, seg3, seg4; //the numbers that should appear on each display
 	
-	output reg [3:0] anode; //array to activate each display
+	output wire [3:0] anode; //array to activate each display
 	output reg [6:0] cathodes; //arrays to display each number
 	
 	reg [1:0] sequence_count; //slow clock sequence counter used to blink
 	
-	reg seq_1Hz[3:0], seg_05Hz[3:0]; //slow clock sequence ROM
+	reg seq_1Hz[3:0], seq_05Hz[3:0]; //slow clock sequence ROM
 	reg anode_seq_output; //on-off-blink sequence output to be fed into AND-gate
 	reg [3:0] anode_cycle_output; //display selector output to be fed into AND-gate
 	reg [6:0] seg_ROM[3:0];
@@ -55,7 +55,7 @@ module seven_seg_display(s_clk, f_clk, mode, seg1, seg2, seg3, seg4, anode, cath
 	end
 	
 	always @ (posedge s_clk) begin
-		sequence_count += 1; //increment sequence (FF array)
+		sequence_count <= sequence_count + 1; //increment sequence (FF array)
 	end
 	
 	always @ (sequence_count, mode) begin
@@ -82,20 +82,26 @@ module seven_seg_display(s_clk, f_clk, mode, seg1, seg2, seg3, seg4, anode, cath
 		// display number
 		case(anode_cycle_output)
 		4'b0001: begin
-			cathodes <= seg_ROM[seg1]
+			cathodes <= seg_ROM[seg1];
 		end
 		4'b0010: begin
-			cathodes <= seg_ROM[seg2]
+			cathodes <= seg_ROM[seg2];
 		end
 		4'b0100: begin
-			cathodes <= seg_ROM[seg3]
+			cathodes <= seg_ROM[seg3];
 		end
 		4'b1000: begin
-			cathodes <= seg_ROM[seg4]
+			cathodes <= seg_ROM[seg4];
 		end
 		default: begin 
 			cathodes <= 7'b0000000;
 		end		
+		endcase
 	end
+	
+	assign anode[0] = anode_seq_output && anode_cycle_output[0];
+	assign anode[1] = anode_seq_output && anode_cycle_output[1];
+	assign anode[2] = anode_seq_output && anode_cycle_output[2];
+	assign anode[3] = anode_seq_output && anode_cycle_output[3];
 
 endmodule

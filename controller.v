@@ -32,7 +32,7 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 		mode=0;
 	end
 
-	always @ (btnDstable, btnLstable, btnRstable, btnDstable, sw0, sw1) begin
+	always @ (btnDstable, btnLstable, btnRstable, btnUstable, sw0, sw1) begin
 		if(btnUstable==1) begin
 			next_time = times+50;
 		end
@@ -67,9 +67,10 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	
 	always@(posedge clk) begin
 		if(times == 0) begin
-			next_times = 0;
+			next_time = 0;
+		end
 		else begin
-			next_times = times - 1;
+			next_time = times - 1;
 		end
 		times <= next_time;
 	end

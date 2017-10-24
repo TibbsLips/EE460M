@@ -1,9 +1,9 @@
 module clk1Hz(clk100Mhz, s_clk);
 	input clk100Mhz; //fast clock
-	output s_Clk; //slow clock
+	output s_clk; //slow clock
 
 	reg[14:0] counter;
-	assign s_Clk= counter[14];  //(2^7 / 128) = 1.34seconds
+	assign s_clk= counter[14];  //(2^7 / 128) = 1.34seconds
 
 	initial begin
 		counter = 0;
