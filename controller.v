@@ -32,7 +32,7 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 		mode=0;
 	end
 
-	always @ (btnDstable, btnLstable, btnRstable, btnUstable, sw0, sw1) begin
+	always @ (posedge btnDstable,posedge btnLstable,posedge btnRstable,posedge btnUstable,posedge sw0,posedge sw1) begin
 		if(btnUstable==1) begin
 			times = times+50;
 		end
