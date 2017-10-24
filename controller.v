@@ -7,7 +7,7 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	input sw0;             //reset to 10s
 	input sw1;             //reset to 205s
 
-	output reg mode;     //will send final LED status from
+	output reg [1:0] mode;     //will send final LED status from
 	output reg [15:0]times;  //will have the time to display on led
 	
 	reg [15:0] next_time;
@@ -34,45 +34,41 @@ module controller(clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 
 	always @ (btnDstable, btnLstable, btnRstable, btnUstable, sw0, sw1) begin
 		if(btnUstable==1) begin
-			next_time = times+50;
+			times = times+50;
 		end
 
 		if(btnLstable==1) begin
-			next_time = times+150;
+			times = times+150;
 		end
 
 		if(btnRstable==1) begin
-			next_time = times+200;
+			times = times+200;
 		end
 		
 		if(btnDstable==1) begin
-			next_time = times+500;
+			times = times+500;
 		end
 		
-		if(next_time>=9999) begin
-			next_time = 9999;
+		if(times>=9999) begin
+			times = 9999;
 		end
 
 		if(sw0 == 1) begin
-			next_time = 10;
+			times = 10;
 		end
 
 		if(sw1 == 1) begin
-			next_time = 205;
+			times = 205;
 		end
-		
-		times <= next_time;
 	
 	end
 	
 	always@(posedge clk) begin
 		if(times == 0) begin
-			next_time = 0;
 		end
 		else begin
-			next_time = times - 1;
+			times = times - 1;
 		end
-		times <= next_time;
 	end
 	
 	always @ (times) begin
