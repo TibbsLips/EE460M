@@ -11,7 +11,12 @@ module DFF(d,clk,q,qn);
   end
 endmodule
 
-
+module AND(a,b,out);///ADDED
+  input a;///ADDED
+  input b;///ADDED
+  output out;///ADDED
+  assign out=a&b;///ADDED
+end module///ADDED
 
 module debounce(clk,in,out);
   input clk;
@@ -25,8 +30,10 @@ module debounce(clk,in,out);
 
   DFF firstFlop(in,clk,q1,q1n);
   DFF secondFlop(q1,clk,q2,q2n);
+  DFF thirdFlop(q2,clk,q3,q3n);///ADDED
+  AND firstAnd(q2,q3n,out);///ADDED
 
-  assign out= q2;
+//  assign out= q2; //this was in original
 
 endmodule
 
