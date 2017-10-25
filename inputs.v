@@ -65,9 +65,10 @@ module inputs(f_clk,clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
       flag=0;
     end
 
-always@(posedge f_clk)// btnUstable,posedge btnLstable,posedge btnRstable,posedge btnDstable, posedge s_clk)//,sw0,sw1)// posedge s_clk)//,posedge clk) didnt have switches, used posedge
+always@(posedge clk)// btnUstable,posedge btnLstable,posedge btnRstable,posedge btnDstable, posedge s_clk)//,sw0,sw1)// posedge s_clk)//,posedge clk) didnt have switches, used posedge
   begin
-//
+if(flag==0)
+    begin
   if(btnUstable==1)
     begin
      flag=1;
@@ -134,10 +135,22 @@ always@(posedge f_clk)// btnUstable,posedge btnLstable,posedge btnRstable,posedg
 
   else
       begin //could write a loop here to cycle through time to decrement so we can use the fastclock in sensitivity
-      flag=0;
-      times=times-1;
-      end
+      if((~btnUstable)&&(~btnDstable)&&(~btnLstable)&&(~btnRstable))
+        begin
+            flag=0;
+        if(times!=0)
+            times=times-1;
+           end
+         end
    end 
+   
+ // end
+
+  else begin
+  flag=0;
+  times=times;
+  end 
+  end
 //  end
 
 //else 
