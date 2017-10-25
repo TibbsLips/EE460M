@@ -11,8 +11,7 @@ module controller(f_clk, s_clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	output reg [1:0] mode;     //will send final LED status from
 	output reg [15:0]times;  //will have the time to display on led
 	
-	reg [15:0] to_add;
-
+	wire [2:0] select;
 
 	wire btnUstable;        //make sure to debounce
 	wire btnLstable;
@@ -26,57 +25,49 @@ module controller(f_clk, s_clk,btnU,btnL,btnR,btnD,sw0,sw1,mode,times);
 	debounce right(f_clk,btnR,btnRstable);
 	debounce down(f_clk,btnD,btnDstable);
 
+    state_machine sm(f_clk, s_clk, btnUstable, btnLstable, btnRstable, btnDstable, sw0, sw1, select);
 
 	initial begin
-		to_add = 0;
 		times=0;
 		mode=0;
 	end
 	
 
-    
-	always @ (posedge btnDstable, posedge btnLstable, posedge btnRstable, posedge btnUstable, posedge sw0, posedge sw1, posedge s_clk) begin
-		if(btnUstable==1) begin
-			times = times+50;
-		end
-        else if(btnLstable==1) begin
-			times = times+150;
-		end
-
-		else if(btnRstable==1) begin
-			times = times+200;
-		end
-		
-		else if(btnDstable==1) begin
-			times = times+500;
-		end
-		
-		else if(times>=9999) begin
-			times = 9999;
-		end
-
-		else if(sw0 == 1) begin
-			times = 10;
-		end
-
-		else if(sw1 == 1) begin
-			times = 205;
-		end
-		
-		else if(times == 0) begin
-            times = times;
-        end
-        
-        else if (s_clk == 1)begin
-            times = times - 1;
-        end
-        else begin
-            times = times;
-        end
+    always @ (posedge f_clk) begin
+        case(select) 
+        0:  begin
+                times <= times;
+            end
+        1:  begin
+                if(times == 0) begin
+                    times = 0;
+                end
+                else begin
+                    times <= times - 1;  
+                end
+            end
+        2:  begin
+                times <= (times + 50) - ((times + 50)/9999)*((times + 50)%9999);
+            end
+        3:  begin
+                times <= (times + 150) - ((times + 150)/9999)*((times + 150)%9999);
+            end
+        4:  begin
+                times <= (times + 200) - ((times + 200)/9999)*((times + 200)%9999);
+            end
+        5:  begin
+                times <= (times + 500) - ((times + 500)/9999)*((times + 500)%9999);
+            end
+        6:  begin
+                times <= 10;
+            end
+        7:  begin
+                times <= 205;
+            end
+        endcase
+    end
 	
-	end
-	
-	always @ (times) begin
+	always @ (*) begin
 		if(times == 0) begin
 			mode = 2'b10;
 		end
